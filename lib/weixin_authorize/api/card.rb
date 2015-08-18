@@ -257,11 +257,12 @@ module WeixinAuthorize
       end
 
       def card_ext(card_id='', code=nil, openid=nil)
+
         timestamp = Time.now.to_i
         nonce_str = SecureRandom.hex(16)
         apiticket = get_apiticket
-        sort = [ apiticket, timestamp, card_id, code, openid, nonce_str ].sort
-        signature = Digest::SHA1.hexdigest(sort)
+        sort_params = [ apiticket, timestamp.to_s, card_id.to_s, code.to_s, openid.to_s, nonce_str ].sort.join
+        signature = Digest::SHA1.hexdigest(sort_params)
         {
             code: code,
             openid: openid,
