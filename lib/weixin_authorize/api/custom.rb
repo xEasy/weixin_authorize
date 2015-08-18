@@ -171,7 +171,8 @@ module WeixinAuthorize
       #     }
       # }
       def send_card_custom(to_user='', card_id='')
-        wxcard = default_options(to_user).merge({wxcard: {wxcard: { card_id: card_id, card_ext: card_ext(card_id)}}})
+        wxcard = default_options(to_user, 'wxcard').merge(
+            {wxcard:{card_id: card_id, card_ext: card_ext(card_id)}})
         http_post(custom_base_url, wxcard)
       end
 
