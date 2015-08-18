@@ -256,22 +256,29 @@ module WeixinAuthorize
         http_post(url)
       end
 
-      # 预览接口
-      # https://api.weixin.qq.com/cgi-bin/message/mass/preview?access_token=ACCESS_TOKEN
-      # 请使用 Symbol 传入
-      # touser = option { openid: openid, wxname: wxname }
-      # card_ext = {code:,openid:, timestamp:1402057159, signature:017bb17407c8e0058a66d72dcc61632b70f511ad}
-      # !!!signature!!! 请使用 client.get_jssign_package['signature'] 传入
-      def card_send_preview(touser='', card_id=[], signature='')
-        url = "cgi-bin/message/mass/preview"
-        card_ext_body =  {
-            code: touser[:openid],
-            timestamp: Time.now.to_i,
+      def card_ext(card_id='', code=nil, openid=nil)
+        timestamp = Time.now.to_i
+        nonce_str = SecureRandom.hex(16)
+        apiticket = get_apiticket
+        sort = [ apiticket, timestamp, card_id, code, openid, nonce_str ].sort
+        signature = Digest::SHA1.hexdigest(sort)
+        {
+            code: code,
+            openid: openid,
+            timestamp: timestamp,
+            nonce_str: nonce_str,
             signature: signature
         }
+      end
+
+      # 预览接口
+      # https://api.weixin.qq.com/cgi-bin/message/mass/preview?access_token=ACCESS_TOKEN
+      # touser = option { openid: openid, wxname: wxname }
+      def card_send_preview(touser='', card_id=[])
+        url = "cgi-bin/message/mass/preview"
         wxcard_body = {
             card_id: card_id,
-            card_ext: card_ext_body
+            card_ext: card_ext
         }
         post_body = {
             msgtype: 'wxcard',
