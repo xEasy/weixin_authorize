@@ -28,6 +28,12 @@ module WeixinAuthorize
     autoload(:RedisStore,  "weixin_authorize/js_ticket/redis_store")
   end
 
+  module ApiTicket
+    autoload(:Store,       "weixin_authorize/api_ticket/store")
+    autoload(:ObjectStore, "weixin_authorize/api_ticket/object_store")
+    autoload(:RedisStore,  "weixin_authorize/api_ticket/redis_store")
+  end
+
   OK_MSG  = "ok".freeze
   OK_CODE = 0.freeze
   GRANT_TYPE = "client_credential".freeze
