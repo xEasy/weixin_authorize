@@ -347,13 +347,6 @@ module WeixinAuthorize
 
   module Api
     module Card
-      # 获取卡券配色方案列表
-      # https://api.weixin.qq.com/card/getcolors?access_token=TOKEN
-      def card_get_colors
-        url = "#{card_base_url}/getcolors"
-        http_get(url)
-      end
-
       def card_ext(card_id='', code=nil, openid=nil)
         timestamp = Time.now.to_i
         nonce_str = SecureRandom.hex(16)
@@ -368,92 +361,102 @@ module WeixinAuthorize
             signature: signature
         }
       end
-
       # 预览接口
       # https://api.weixin.qq.com/cgi-bin/message/mass/preview?access_token=ACCESS_TOKEN
       # touser = option { openid: openid, wxname: wxname }
-      def card_send_preview(touser='', card_id=[])
-        url = "cgi-bin/message/mass/preview"
+      def card_send_preview(card_id='', towxname='', toopenid='')
+        url = "/message/mass/preview"
         wxcard_body = {
             card_id: card_id,
             card_ext: card_ext
         }
-        post_body = {
-            msgtype: 'wxcard',
-            touser: touser[:openid],
-            towxname: touser[:wxname],
-            wxcard: wxcard_body
-        }
+        post_body = { msgtype: 'wxcard' }.merge(wxcard_body)
+        post_body = post_body.merge({ touser: toopenid }) if !toopenid.nil? || !toopenid.empty?
+        post_body = post_body.merge({ towxname: towxname }) if !towxname.nil? ||!towxname.empty?
         http_post(url, post_body)
       end
+
+      # 获取卡券配色方案列表
+      # https://api.weixin.qq.com/card/getcolors?access_token=TOKEN
+      def card_get_colors
+        url = "#{card_base_url}/getcolors"
+        http_get(url, {} ,'api')
+      end
+
 
       # 统计卡券数据 - 拉取会员卡数据接口
       # https://api.weixin.qq.com/datacube/getcardmembercardinfo?access_token=ACCESS_TOKEN
       def card_datacube_info_member_card(begin_date=0, end_date=0, cond_source=1)
+        begin_date = datacube_datetime_format begin_date
+        end_date = datacube_datetime_format end_date
         url = "#{datacube_base_url}/getcardmembercardinfo"
         post_body = {
-            begin_date: begin_date.strptime("%Y-%m-%d").to_s,
-            end_date: end_date.strptime("%Y-%m-%d").to_s,
+            begin_date: begin_date,
+            end_date: end_date,
             cond_source: cond_source
         }
-        http_post(url, post_body)
+        http_post(url, post_body, {}, 'api')
       end
 
       # 获取免费券数据接口
       # https://api.weixin.qq.com/datacube/getcardcardinfo?access_token=ACCESS_TOKEN
       def card_datacube_info(begin_date=0, end_date=0, cond_source=1, card_id=nil)
+        begin_date = datacube_datetime_format begin_date
+        end_date = datacube_datetime_format end_date
         url = "#{datacube_base_url}/getcardcardinfo"
         post_body = {
-            begin_date: begin_date.strptime("%Y-%m-%d").to_s,
-            end_date: end_date.strptime("%Y-%m-%d").to_s,
+            begin_date: begin_date,
+            end_date: end_date,
             cond_source: cond_source,
             card_id: card_id
         }
-        http_post(url, post_body)
+        http_post(url, post_body, {}, 'api')
       end
 
       # 拉取卡券概况数据接口
       # https://api.weixin.qq.com/datacube/getcardbizuininfo?access_token=ACCESS_TOKEN
       def card_datacube(begin_date=0, end_date=0, cond_source=1)
+        begin_date = datacube_datetime_format begin_date
+        end_date = datacube_datetime_format end_date
         url = "#{datacube_base_url}/getcardbizuininfo"
         post_body = {
-            begin_date: begin_date.strptime("%Y-%m-%d").to_s,
-            end_date: end_date.strptime("%Y-%m-%d").to_s,
+            begin_date: begin_date,
+            end_date: end_date,
             cond_source: cond_source
         }
-        http_post(url, post_body)
+        http_post(url, post_body, {}, 'api')
       end
 
       # 设置测试白名单
       # https://api.weixin.qq.com/card/testwhitelist/set?access_token=TOKEN
-      def card_testwhitelist(openid=[], wxusername=[])
-        url = "#{card_base_url}/testwhitelist"
+      def card_testwhitelist(wxusername=[], openid=[])
+        url = "#{card_base_url}/testwhitelist/set"
         post_body = {
             openid: openid[0, 9], # 微信接口限制10个白名单用户，多余的抛弃
             username: wxusername[0,9] # 微信接口限制10个白名单用户，多余的抛弃
         }
-        http_post(url, post_body)
+        http_post(url, post_body, {}, 'api')
       end
 
-      # 图文消息群发卡券
+      # 获取图文消息卡券HTML代码接口
       # https://api.weixin.qq.com/card/mpnews/gethtml?access_token=TOKEN
-      def card_code_mpnews(card_id=nil)
-        url = "#{card_base_url}/code/mpnews/gethtml"
+      def card_code_mpnews_gethtml(card_id=nil)
+        url = "#{card_base_url}/mpnews/gethtml"
         post_body = {
             card_id: card_id
         }
-        http_post(url, post_body)
+        http_post(url, post_body, {}, 'api')
       end
 
       # 核查code接口
       # http://api.weixin.qq.com/card/code/checkcode?access_token=ACCESS_TOKEN
-      def card_code_checkcode(card_id='', codelist='')
+      def card_code_checkcode(card_id='', codelist=[])
         url = "#{card_base_url}/code/checkcode"
         post_body = {
             card_id: card_id,
             code: codelist
         }
-        http_post(url, post_body)
+        http_post(url, post_body, {}, 'api')
       end
 
       # 导入code接口
@@ -465,7 +468,7 @@ module WeixinAuthorize
             card_id: card_id,
             code: codelist
         }
-        http_post(url, post_body)
+        http_post(url, post_body, {}, 'api')
       end
 
       # 创建货架接口
@@ -491,7 +494,7 @@ module WeixinAuthorize
       # SCENE_CARD_CUSTOM_CELL	卡券自定义cell
       # SCENE_CARD_MSG_URL 卡券消息运营位
       #
-      def card_landingpage(banner='', title='', can_share=false, scene='', cardlist=[{cardid: cardid, thumb_url: thumb_url}])
+      def card_landingpage(banner='', title='', can_share=false, scene='', cardlist=[{cardid: '', thumb_url: ''}])
         url = "#{card_base_url}/landingpage/create"
         post_body = {
             banner: banner,
@@ -500,14 +503,14 @@ module WeixinAuthorize
             scene: scene,
             cardlist: cardlist
         }
-        http_post(url, post_body)
+        http_post(url, post_body, {}, 'api')
       end
 
       # 创建二维码接口
       # https://api.weixin.qq.com/card/qrcode/create?access_token=TOKEN
       def card_code_qrcode(card_id='', code=nil, openid=nil,
                            expire_seconds=nil,   is_unique_code=nil, outer_id=nil)
-        url = "#{card_base_url}/code/qrcode/create"
+        url = "#{card_base_url}/qrcode/create"
         card_body = {
             card_id: card_id,
             code: code,
@@ -518,9 +521,9 @@ module WeixinAuthorize
         post_body = {
             action_name: 'QR_CARD',
             expire_seconds: expire_seconds,
-            action_info: card_body
+            action_info: {card: card_body}
         }
-        http_post(url, post_body)
+        http_post(url, post_body, {}, 'api')
       end
 
       # Code解码接口
@@ -530,7 +533,7 @@ module WeixinAuthorize
         post_body = {
             encrypt_code: encrypt_code
         }
-        http_post(url, post_body)
+        http_post(url, post_body, {}, 'api')
       end
 
       # 核销Code接口
@@ -541,7 +544,7 @@ module WeixinAuthorize
             card_id: card_id,
             code: code
         }
-        http_post(url, post_body)
+        http_post(url, post_body, {}, 'api')
       end
 
 
@@ -553,7 +556,7 @@ module WeixinAuthorize
             card_id: card_id,
             code: code
         }
-        http_post(url, post_body)
+        http_post(url, post_body, {}, 'api')
       end
 
       # 删除卡券接口
@@ -563,7 +566,7 @@ module WeixinAuthorize
         post_body = {
             card_id: card_id
         }
-        http_post(url, post_body)
+        http_post(url, post_body, {}, 'api')
       end
 
 
@@ -576,7 +579,7 @@ module WeixinAuthorize
             code: code,
             new_code: new_code
         }
-        http_post(url, post_body)
+        http_post(url, post_body, {}, 'api')
       end
 
       # 修改库存接口
@@ -588,16 +591,16 @@ module WeixinAuthorize
             increase_stock_value: increase_stock_value,
             reduce_stock_value: reduce_stock_value
         }
-        http_post(url, post_body)
+        http_post(url, post_body, {}, 'api')
       end
 
       # 更改卡券信息接口
       # https://api.weixin.qq.com/card/update?access_token=TOKEN
       def card_update(card_id='', card)
-        card = card[:card] if !card[:card].nil?
+        card = card[:card] if card.has_key?(:card)
         card[:card_id] = card_id
         url = "#{card_base_url}/update"
-        http_post(url, card)
+        http_post(url, card, {}, 'api')
       end
 
       # 批量查询卡列表
@@ -620,7 +623,7 @@ module WeixinAuthorize
             count: count,
             status_list: status_list
         }
-        http_post(url, post_body)
+        http_post(url, post_body, {}, 'api')
       end
 
       # 查看卡券详情
@@ -630,18 +633,18 @@ module WeixinAuthorize
         post_body = {
             card_id: card_id
         }
-        http_post(url, post_body)
+        http_post(url, post_body, {}, 'api')
       end
 
       # 获取用户已领取卡券接口
       # https://api.weixin.qq.com/card/user/getcardlist?access_token=TOKEN
       def card_user_getcardlist(openid='', card_id=nil)
-        url = "#{card_base_url}user/getcardlist"
+        url = "#{card_base_url}/user/getcardlist"
         post_body = {
             openid: openid,
             card_id: card_id
         }
-        http_post(url, post_body)
+        http_post(url, post_body, {}, 'api')
       end
 
 
@@ -652,7 +655,7 @@ module WeixinAuthorize
         post_body = {
             code: code
         }
-        http_post(url, post_body)
+        http_post(url, post_body, {}, 'api')
       end
 
       INVOKE_MEETINGTICKET_UPDATE_REQUIRED_FIELDS = %i(code zone entrance seat_number)
@@ -679,7 +682,7 @@ module WeixinAuthorize
             entrance:     params[:entrance],
             seat_number:  params[:seat_number]
         }
-        http_post(url, post_body)
+        http_post(url, post_body, {}, 'api')
       end
 
       INVOKE_MOVIETICKET_UPDATE_REQUIRED_FIELDS = %i(show_time duration code card_id ticket_class)
@@ -706,7 +709,7 @@ module WeixinAuthorize
             show_time:      params[:show_time],
             duration:       params[:duration]
         }
-        http_post(url, post_body)
+        http_post(url, post_body, {}, 'api')
       end
 
       INVOKE_BOARDPASS_UPDATE_REQUIRED_FIELDS = %i(code passenger_name etkt_bnr)
@@ -733,15 +736,16 @@ module WeixinAuthorize
             seat:        params[:seat],
             is_cancel:   params[:is_cancel]
         }
-        http_post(url, post_body)
+        http_post(url, post_body, {}, 'api')
       end
 
       # 微信卡券创建接口
       # https://api.weixin.qq.com/card/create?access_token=ACCESS_TOKEN
       def card_create(card)
-        card = JSON.load(card) if card.is_a?(String)
+        endpoint = 'api'
+        endpoint = 'plain' if card.is_a?(String)
         url = "#{card_base_url}/create"
-        http_post(url, card)
+        http_post(url, card, {}, endpoint)
       end
 
       private
@@ -758,6 +762,12 @@ module WeixinAuthorize
             warn("Weixin Card: missing required param: #{name}") if options.nil? || !options.has_key?(name) || options[name].nil? || options[name].empty?
           end
         end
+
+      def datacube_datetime_format(param)
+        param = Time.at(param) if param.is_a?(Integer)
+        param = param.strftime("%Y-%m-%d") if param.is_a?(Time)
+        param
+      end
 
     end
   end

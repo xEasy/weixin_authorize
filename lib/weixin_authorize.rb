@@ -50,7 +50,7 @@ module WeixinAuthorize
     def http_post_without_token(url, post_body={}, url_params={}, endpoint="plain")
       post_api_url = endpoint_url(endpoint, url)
       # to json if invoke "plain"
-      if endpoint == "plain" || endpoint == CUSTOM_ENDPOINT
+      if endpoint == "plain" || endpoint == "api" || endpoint == CUSTOM_ENDPOINT
         post_body = JSON.dump(post_body)
       end
       load_json(resource(post_api_url).post(post_body, params: url_params))
