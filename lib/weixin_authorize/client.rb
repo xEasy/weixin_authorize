@@ -8,6 +8,7 @@ module WeixinAuthorize
 
     include MonitorMixin
 
+    include Api::Poi
     include Api::User
     include Api::Card
     include Api::Menu
