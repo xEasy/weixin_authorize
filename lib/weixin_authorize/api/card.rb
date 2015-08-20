@@ -378,7 +378,7 @@ module WeixinAuthorize
 
       # 获取卡券配色方案列表
       # https://api.weixin.qq.com/card/getcolors?access_token=TOKEN
-      def card_get_colors
+      def card_colors
         url = "#{card_base_url}/getcolors"
         http_get(url, {} ,'api')
       end
@@ -440,7 +440,7 @@ module WeixinAuthorize
 
       # 获取图文消息卡券HTML代码接口
       # https://api.weixin.qq.com/card/mpnews/gethtml?access_token=TOKEN
-      def card_code_mpnews_gethtml(card_id=nil)
+      def card_mpnews_html(card_id=nil)
         url = "#{card_base_url}/mpnews/gethtml"
         post_body = {
             card_id: card_id
@@ -450,7 +450,7 @@ module WeixinAuthorize
 
       # 核查code接口
       # http://api.weixin.qq.com/card/code/checkcode?access_token=ACCESS_TOKEN
-      def card_code_checkcode(card_id='', codelist=[])
+      def card_code_check(card_id='', codelist=[])
         url = "#{card_base_url}/code/checkcode"
         post_body = {
             card_id: card_id,
@@ -494,7 +494,7 @@ module WeixinAuthorize
       # SCENE_CARD_CUSTOM_CELL	卡券自定义cell
       # SCENE_CARD_MSG_URL 卡券消息运营位
       #
-      def card_landingpage(banner='', title='', can_share=false, scene='', cardlist=[{cardid: '', thumb_url: ''}])
+      def card_landingpage_create(banner='', title='', can_share=false, scene='', cardlist=[{cardid: '', thumb_url: ''}])
         url = "#{card_base_url}/landingpage/create"
         post_body = {
             banner: banner,
@@ -508,7 +508,7 @@ module WeixinAuthorize
 
       # 创建二维码接口
       # https://api.weixin.qq.com/card/qrcode/create?access_token=TOKEN
-      def card_code_qrcode(card_id='', code=nil, openid=nil,
+      def card_qrcode_create(card_id='', code=nil, openid=nil,
                            expire_seconds=nil,   is_unique_code=nil, outer_id=nil)
         url = "#{card_base_url}/qrcode/create"
         card_body = {
@@ -584,7 +584,7 @@ module WeixinAuthorize
 
       # 修改库存接口
       # https://api.weixin.qq.com/card/modifystock?access_token=TOKEN
-      def card_modifystock(card_id='', increase_stock_value=nil, reduce_stock_value=nil)
+      def card_modify_stock(card_id='', increase_stock_value=nil, reduce_stock_value=nil)
         url = "#{card_base_url}/modifystock"
         post_body = {
             card_id: card_id,
@@ -616,7 +616,7 @@ module WeixinAuthorize
       # CARD_STATUS_USER_DELETE   卡券被用户删除
       # CARD_STATUS_USER_DISPATCH 在公众平台投放过的卡券
 
-      def card_batchget(offset=0, count=50, status_list=['CARD_STATUS_USER_DISPATCH'])
+      def cards(offset=0, count=50, status_list=['CARD_STATUS_USER_DISPATCH'])
         url = "#{card_base_url}/batchget"
         post_body = {
             offset: offset,
@@ -628,7 +628,7 @@ module WeixinAuthorize
 
       # 查看卡券详情
       # https://api.weixin.qq.com/card/get?access_token=TOKEN
-      def card_get(card_id='')
+      def card(card_id='')
         url = "#{card_base_url}/get"
         post_body = {
             card_id: card_id
@@ -638,7 +638,7 @@ module WeixinAuthorize
 
       # 获取用户已领取卡券接口
       # https://api.weixin.qq.com/card/user/getcardlist?access_token=TOKEN
-      def card_user_getcardlist(openid='', card_id=nil)
+      def user_cards(openid='', card_id=nil)
         url = "#{card_base_url}/user/getcardlist"
         post_body = {
             openid: openid,
@@ -650,7 +650,7 @@ module WeixinAuthorize
 
       # 查询Code
       # https://api.weixin.qq.com/card/code/get?access_token=TOKEN
-      def card_code_get(code='')
+      def card_code(code='')
         url = "#{card_base_url}/code/get"
         post_body = {
             code: code
@@ -715,7 +715,7 @@ module WeixinAuthorize
       INVOKE_BOARDPASS_UPDATE_REQUIRED_FIELDS = %i(code passenger_name etkt_bnr)
       # 更新飞机票信息
       # https://api.weixin.qq.com/card/boardingpass/checkin?access_token=TOKEN
-      def card_boarding_pass_check_in(params)
+      def card_boarding_pass_checkin(params)
         params = {code: '',
                   card_id: nil,
                   passenger_name: '',
@@ -763,11 +763,11 @@ module WeixinAuthorize
           end
         end
 
-      def datacube_datetime_format(param)
-        param = Time.at(param) if param.is_a?(Integer)
-        param = param.strftime("%Y-%m-%d") if param.is_a?(Time)
-        param
-      end
+        def datacube_datetime_format(param)
+          param = Time.at(param) if param.is_a?(Integer)
+          param = param.strftime("%Y-%m-%d") if param.is_a?(Time)
+          param
+        end
 
     end
   end
