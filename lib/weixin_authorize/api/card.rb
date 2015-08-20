@@ -597,10 +597,10 @@ module WeixinAuthorize
       # 更改卡券信息接口
       # https://api.weixin.qq.com/card/update?access_token=TOKEN
       def card_update(card_id='', card)
-        card = card[:card] if card.has_key?(:card)
-        card[:card_id] = card_id
+        endpoint = 'api'
+        endpoint = 'plain' if card.is_a?(String) # 第三方开发者自定义json
         url = "#{card_base_url}/update"
-        http_post(url, card, {}, 'api')
+        http_post(url, card, {}, endpoint)
       end
 
       # 批量查询卡列表
@@ -650,10 +650,11 @@ module WeixinAuthorize
 
       # 查询Code
       # https://api.weixin.qq.com/card/code/get?access_token=TOKEN
-      def card_code(code='')
+      def card_code(card_id=nil, code='')
         url = "#{card_base_url}/code/get"
         post_body = {
-            code: code
+            code: code,
+            card_id: card_id
         }
         http_post(url, post_body, {}, 'api')
       end
@@ -743,7 +744,7 @@ module WeixinAuthorize
       # https://api.weixin.qq.com/card/create?access_token=ACCESS_TOKEN
       def card_create(card)
         endpoint = 'api'
-        endpoint = 'plain' if card.is_a?(String)
+        endpoint = 'plain' if card.is_a?(String) # 第三方开发者自定义json
         url = "#{card_base_url}/create"
         http_post(url, card, {}, endpoint)
       end
