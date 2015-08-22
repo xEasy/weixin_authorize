@@ -98,6 +98,17 @@ module WeixinAuthorize
       Time.now.to_i + expires_in.to_i - key_expired.to_i
     end
 
+    def check_required_options(options, names, module_name='Weixin Authorize')
+      missinglsit = []
+      names.each do |name|
+        missinglsit << name if options.nil?           ||
+            !options.has_key?(name) ||
+            options[name].nil?     ||
+            (!options[name].is_a?(Integer) && options[name].empty?)
+      end
+      raise "#{module_name}: 缺少参数: #{missinglsit.join(', ')}"
+    end
+
   end
 
 end
