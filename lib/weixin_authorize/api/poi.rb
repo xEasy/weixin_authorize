@@ -2,7 +2,7 @@
 module WeixinAuthorize
   module Api
     module Poi
-
+      MODULE_NAME = 'POI(微信门店接口)'
 
       INVOKE_POI_REQUIRED_FIELDS = %i(business_name branch_name
                                       province city district address
@@ -32,7 +32,7 @@ module WeixinAuthorize
             introduction: nil,
             recommend: nil,
         }.merge(params)
-        check_required_options(params, INVOKE_POI_REQUIRED_FIELDS)
+        check_required_options(params, INVOKE_POI_REQUIRED_FIELDS, MODULE_NAME)
         post_body = {
             business: { base_info: params }
         }
@@ -45,9 +45,9 @@ module WeixinAuthorize
       # https://api.weixin.qq.com/cgi-bin/poi/updatepoi?access_token=TOKEN
       def poi_update(params)
         params = {
-            poi_id: poi_id
+            poi_id: ''
         }.merge(params)
-        check_required_options(params, INVOKE_POI_UPDATE_REQUIRED_FIELDS)
+        check_required_options(params, INVOKE_POI_UPDATE_REQUIRED_FIELDS, MODULE_NAME)
         post_body = {
             business: { base_info: params }
         }
@@ -57,12 +57,8 @@ module WeixinAuthorize
 
       # 拉取门店类目表
       # http://api.weixin.qq.com/cgi-bin/api_getwxcategory?access_token=TOKEN
-      def poi_category(poi_id='')
-        url = "/api_getwxcategory"
-        post_body = {
-            poi_id: poi_id
-        }
-        http_post(url, post_body)
+      def poi_category()
+        http_get("/api_getwxcategory")
       end
 
 
@@ -100,18 +96,9 @@ module WeixinAuthorize
 
       private
 
-        def poi_base_url
-          "/poi"
-        end
-
-        def check_required_options(options, names)
-          names.each do |name|
-            warn("Weixin Poi: missing required param: #{name}") if options.nil? ||
-                !options.has_key?(name) ||
-                options[name].nil? ||
-                (!options[name].is_a?(Integer) && options[name].empty?)
-          end
-        end
+      def poi_base_url
+        "/poi"
+      end
 
     end
   end
