@@ -2,7 +2,7 @@
 module WeixinAuthorize
   module Api
     module Poi
-      MODULE_NAME = 'POI(微信门店接口)'
+      MODULE_NAME = 'POI API(微信门店接口)'
 
       INVOKE_POI_REQUIRED_FIELDS = %i(business_name branch_name
                                       province city district address
@@ -13,28 +13,28 @@ module WeixinAuthorize
       # http://api.weixin.qq.com/cgi-bin/poi/addpoi?access_token=TOKEN
       def poi_add(params)
         params = {
-            business_name: '',
-            branch_name: '',
-            province: '',
-            city: '',
-            district: '',
-            address: '',
-            telephone: '',
-            categories: '',
-            offset_type: 1, #火星坐标
-            longitude: '',
-            latitude: '',
-            photo_list: [],
-            special: '',
-            open_time: '',
-            avg_price: nil,
-            sid: '',
-            introduction: nil,
-            recommend: nil,
+          business_name: '',
+          branch_name: '',
+          province: '',
+          city: '',
+          district: '',
+          address: '',
+          telephone: '',
+          categories: '',
+          offset_type: 1, #火星坐标
+          longitude: '',
+          latitude: '',
+          photo_list: [],
+          special: '',
+          open_time: '',
+          avg_price: nil,
+          sid: '',
+          introduction: nil,
+          recommend: nil,
         }.merge(params)
-        check_required_options(params, INVOKE_POI_REQUIRED_FIELDS, MODULE_NAME)
+        WeixinAuthorize.check_required_options(params, INVOKE_POI_REQUIRED_FIELDS, MODULE_NAME)
         post_body = {
-            business: { base_info: params }
+          business: { base_info: params }
         }
         url = "#{poi_base_url}/addpoi"
         http_post(url, post_body)
@@ -45,11 +45,11 @@ module WeixinAuthorize
       # https://api.weixin.qq.com/cgi-bin/poi/updatepoi?access_token=TOKEN
       def poi_update(params)
         params = {
-            poi_id: ''
+          poi_id: ''
         }.merge(params)
-        check_required_options(params, INVOKE_POI_UPDATE_REQUIRED_FIELDS, MODULE_NAME)
+        WeixinAuthorize.check_required_options(params, INVOKE_POI_UPDATE_REQUIRED_FIELDS, MODULE_NAME)
         post_body = {
-            business: { base_info: params }
+          business: { base_info: params }
         }
         url = "#{poi_base_url}/updatepoi"
         http_post(url, post_body)
@@ -67,7 +67,7 @@ module WeixinAuthorize
       def poi_delete(poi_id='')
         url = "#{poi_base_url}/delpoi"
         post_body = {
-            poi_id: poi_id
+          poi_id: poi_id
         }
         http_post(url, post_body)
       end
@@ -77,7 +77,7 @@ module WeixinAuthorize
       def poi(poi_id='')
         url = "#{poi_base_url}/getpoi"
         post_body = {
-            poi_id: poi_id
+          poi_id: poi_id
         }
         http_post(url, post_body)
       end
@@ -88,8 +88,8 @@ module WeixinAuthorize
       def pois(offset=0, limit=50)
         url = "#{poi_base_url}/getpoilist"
         post_body = {
-            begin: offset,
-            limit: limit
+          begin: offset,
+          limit: limit
         }
         http_post(url, post_body)
       end

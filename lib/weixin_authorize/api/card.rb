@@ -7,52 +7,34 @@ module WeixinAuthorize
   # 而 JsonHelper 不属于 API 部分
   # 所以还是把 JsonHelper 放在外层
   module CardJsonHelper
-    def self.check_required_options(options, names)
-      names.each do |name|
-        warn("Weixin CardJsonHelper: missing required param: #{name}") if options.nil? ||
-            !options.has_key?(name) ||
-            options[name].nil? ||
-            (!options[name].is_a?(Integer) && options[name].empty?)
-      end
-    end
-
-    class CardJsonHelperClass
-      def self.check_required_options(options, names)
-        names.each do |name|
-          warn("Weixin CardJsonHelper: missing required param: #{name}") if options.nil? ||
-              !options.has_key?(name) ||
-              options[name].nil? ||
-              (!options[name].is_a?(Integer) && options[name].empty?)
-        end
-      end
-    end
-
-    INVOKE_SKU_REQUIRED_FIELDS = %i(quantity)
-    def self.sku(params)
-      params = {
+    MODULE_JSON_HELPER_NAME = 'CardJsonHelper(微信卡券接口助手)'
+    class << self
+      INVOKE_SKU_REQUIRED_FIELDS = %i(quantity)
+      def sku(params)
+        params = {
           quantity: nil
-      }.merge(params)
-      check_required_options(params, INVOKE_SKU_REQUIRED_FIELDS)
-      params
-    end
+        }.merge(params)
+        WeixinAuthorize.check_required_options(params, INVOKE_SKU_REQUIRED_FIELDS, MODULE_JSON_HELPER_NAME)
+        params
+      end
 
-    INVOKE_DATEIINFO_REQUIRED_FIELDS = %i(type)
-    def self.date_info(params)
-      params = {
+      INVOKE_DATEIINFO_REQUIRED_FIELDS = %i(type)
+      def date_info(params)
+        params = {
           type: '',
           begin_timestamp: nil,
           end_timestamp:   nil,
           fixed_term: nil,
           fixed_begin_term: nil
-      }.merge(params)
-      check_required_options(params, INVOKE_DATEIINFO_REQUIRED_FIELDS)
-      params
-    end
+        }.merge(params)
+        WeixinAuthorize.check_required_options(params, INVOKE_DATEIINFO_REQUIRED_FIELDS, MODULE_JSON_HELPER_NAME)
+        params
+      end
 
-    INVOKE_BASEINFO_REQUIRED_FIELDS = %i(logo_url code_type brand_name title sub_title color notice description sku date_info)
-    # 创建卡券base_info json
-    def self.base_info(params)
-      params = {
+      INVOKE_BASEINFO_REQUIRED_FIELDS = %i(logo_url code_type brand_name title sub_title color notice description sku date_info)
+      # 创建卡券base_info json
+      def base_info(params)
+        params = {
           # 必填参数
           logo_url: '',
           code_type: '',
@@ -64,11 +46,11 @@ module WeixinAuthorize
           description: '',
           sku: { quantity: nil },
           date_info: {
-              type: '',
-              begin_timestamp: nil,
-              end_timestamp:  nil,
-              fixed_term: nil,
-              fixed_begin_term: nil
+            type: '',
+            begin_timestamp: nil,
+            end_timestamp:  nil,
+            fixed_term: nil,
+            fixed_begin_term: nil
           },
           # 可选参数
           use_custom_code: nil,
@@ -85,22 +67,23 @@ module WeixinAuthorize
           get_limit: nil,
           can_share: nil,
           can_give_friend: nil
-      }.merge(params)
-      check_required_options(params, INVOKE_BASEINFO_REQUIRED_FIELDS)
-      params
+        }.merge(params)
+        WeixinAuthorize.check_required_options(params, INVOKE_BASEINFO_REQUIRED_FIELDS, MODULE_JSON_HELPER_NAME)
+        params
+      end
     end
 
-    class MemberCard < CardJsonHelperClass
+    class MemberCard
       # 创建自定义会员信息类目json
       # 会员卡激活后显示。
-      INVOKE_CUSTONCELL_REQUIRED_FIELDS = %i(name_type tips url)
+      INVOKE_CUSTOMCELL_REQUIRED_FIELDS = %i(name_type tips url)
       def self.custom_cell(params)
         params = {
-            name_type: '',
-            tips: '',
-            url: ''
+          name_type: '',
+          tips: '',
+          url: ''
         }.merge(params)
-        check_required_options(params, INVOKE_CUSTONCELL_REQUIRED_FIELDS)
+        WeixinAuthorize.check_required_options(params, INVOKE_CUSTOMCELL_REQUIRED_FIELDS, MODULE_JSON_HELPER_NAME)
         params
       end
 
@@ -116,33 +99,33 @@ module WeixinAuthorize
       INVOKE_CUSTONFIELD_REQUIRED_FIELDS = %i(name_type url)
       def self.custom_field(params)
         params = {
-            name_type: '',
-            url: ''
+          name_type: '',
+          url: ''
         }.merge(params)
-        check_required_options(params, INVOKE_CUSTONFIELD_REQUIRED_FIELDS)
+        WeixinAuthorize.check_required_options(params, INVOKE_CUSTONFIELD_REQUIRED_FIELDS, MODULE_JSON_HELPER_NAME)
         params
       end
 
       INVOKE_BONUS_REQUIRED_FIELDS = %i(supply_bonus)
       def self.bonus(params)
         params = {
-            supply_bonus: nil,
-            bonus_url: nil,
-            bonus_cleared: nil,
-            bonus_rules: nil
+          supply_bonus: nil,
+          bonus_url: nil,
+          bonus_cleared: nil,
+          bonus_rules: nil
         }.merge(params)
-        check_required_options(params, INVOKE_BONUS_REQUIRED_FIELDS)
+        WeixinAuthorize.check_required_options(params, INVOKE_BONUS_REQUIRED_FIELDS, MODULE_JSON_HELPER_NAME)
         params
       end
 
       INVOKE_BALANCE_REQUIRED_FIELDS = %i(supply_balance)
       def self.balance(params)
         {
-            supply_balance: nil,
-            balance_url: nil,
-            balance_rules: nil
+          supply_balance: nil,
+          balance_url: nil,
+          balance_rules: nil
         }.merge(params)
-        check_required_options(params, INVOKE_BALANCE_REQUIRED_FIELDS)
+        WeixinAuthorize.check_required_options(params, INVOKE_BALANCE_REQUIRED_FIELDS, MODULE_JSON_HELPER_NAME)
         params
       end
 
@@ -150,24 +133,25 @@ module WeixinAuthorize
       # 创建会员卡json
       def self.create(bash_info, params)
         params = {
-            activate_url: '',
-            prerogative: '',
-            bonus: {
-                supply_bonus: nil,
-                bonus_url: nil,
-                bonus_cleared: nil,
-                bonus_rules: nil
-            },
-            balance: {
-                supply_balance: nil,
-                balance_url: nil,
-                balance_rules: nil
-            },
-            custom_field: [],
-            custom_cell:  []
+          activate_url: '',
+          prerogative: '',
+          bonus: {
+            supply_bonus: nil,
+            bonus_url: nil,
+            bonus_cleared: nil,
+            bonus_rules: nil
+          },
+          balance: {
+            supply_balance: nil,
+            balance_url: nil,
+            balance_rules: nil
+          },
+          custom_field: [],
+          custom_cell:  []
         }.merge(params)
-        check_required_options(params, INVOKE_MEMBERCARD_REQUIRED_FIELDS)
-        {card:{
+        WeixinAuthorize.check_required_options(params, INVOKE_MEMBERCARD_REQUIRED_FIELDS, MODULE_JSON_HELPER_NAME)
+        {
+          card: {
             card_type: 'MEMBER_CARD',
             base_info: bash_info,
             activate_url: params[:activate_url],
@@ -182,170 +166,190 @@ module WeixinAuthorize
             custom_field1: params[:custom_field[0]],
             custom_field2: params[:custom_field[1]],
             custom_field3: params[:custom_field[2]],
-            custom_cell1: params[:custom_cell[0]]}
+            custom_cell1: params[:custom_cell[0]]
+          }
         }
       end
     end
 
     INVOKE_GROUPON_REQUIRED_FIELDS = %i(deal_detail)
-    class Groupon < CardJsonHelperClass
+    class Groupon
       # 创建团购券json
       def self.create(bash_info, params)
         params = {
-            deal_detail: ''
+          deal_detail: ''
         }.merge(params)
-        check_required_options(params, INVOKE_GROUPON_REQUIRED_FIELDS)
-        {card:{
+        WeixinAuthorize.check_required_options(params, INVOKE_GROUPON_REQUIRED_FIELDS, MODULE_JSON_HELPER_NAME)
+        {
+          card: {
             card_type: 'GROUPON',
             base_info: bash_info,
-            deal_detail: params[:deal_detail]}
+            deal_detail: params[:deal_detail]
+          }
         }
       end
     end
 
     INVOKE_CASH_REQUIRED_FIELDS = %i(least_cost reduce_cost)
-    class Cash < CardJsonHelperClass
+    class Cash
       # 创建代金券json
       def self.create(bash_info, params)
         params = {
-            least_cost: nil,
-            reduce_cost: nil
+          least_cost: nil,
+          reduce_cost: nil
         }.merge(params)
-        check_required_options(params, INVOKE_CASH_REQUIRED_FIELDS)
-        {card:{
+        WeixinAuthorize.check_required_options(params, INVOKE_CASH_REQUIRED_FIELDS, MODULE_JSON_HELPER_NAME)
+        {
+          card: {
             card_type: 'CASH',
             base_info: bash_info,
             least_cost: params[:least_cost],
-            reduce_cost: params[:reduce_cost], }
+            reduce_cost: params[:reduce_cost],
+          }
         }
       end
     end
 
     INVOKE_DISCOUNT_REQUIRED_FIELDS = %i(discount)
-    class Discount < CardJsonHelperClass
+    class Discount
       # 创建折扣券json
       def self.create(bash_info, params)
         params = {
             discount: nil
         }.merge(params)
-        check_required_options(params, INVOKE_DISCOUNT_REQUIRED_FIELDS)
-        {card:{
+        WeixinAuthorize.check_required_options(params, INVOKE_DISCOUNT_REQUIRED_FIELDS, MODULE_JSON_HELPER_NAME)
+        {
+          card: {
             card_type: 'DISCOUNT',
             base_info: bash_info,
-            discount: params[:discount]}
+            discount: params[:discount]
+          }
         }
       end
     end
 
     INVOKE_GIFT_REQUIRED_FIELDS = %i(gift)
-    class Gift < CardJsonHelperClass
+    class Gift
       # 创建礼品券json
       def self.create(bash_info, params)
         params = {
             gift: ''
         }.merge(params)
-        check_required_options(params, INVOKE_GIFT_REQUIRED_FIELDS)
-        {card:{
+        WeixinAuthorize.check_required_options(params, INVOKE_GIFT_REQUIRED_FIELDS, MODULE_JSON_HELPER_NAME)
+        {
+          card: {
             card_type: 'DISCOUNT',
             base_info: bash_info,
-            gift: params[:gift]}
+            gift: params[:gift]
+          }
         }
       end
     end
 
     INVOKE_GENERALCOUPON_REQUIRED_FIELDS = %i(default_detail)
-    class GeneralCoupon < CardJsonHelperClass
+    class GeneralCoupon
       # 创建通用券json
       def self.create(bash_info, params)
         params = {
             default_detail: ''
         }.merge(params)
-        check_required_options(params, INVOKE_GENERALCOUPON_REQUIRED_FIELDS)
-        {card:{
+        WeixinAuthorize.check_required_options(params, INVOKE_GENERALCOUPON_REQUIRED_FIELDS, MODULE_JSON_HELPER_NAME)
+        {
+          card: {
             card_type: 'GENERAL_COUPON',
             base_info: bash_info,
-            default_detail: params[:default_detail]}
+            default_detail: params[:default_detail]
+          }
         }
       end
     end
 
     INVOKE_MEETINGTICKET_REQUIRED_FIELDS = %i(meeting_detail)
-    class MeetingTicket < CardJsonHelperClass
+    class MeetingTicket
       # 创建会议门票json
       def self.create(bash_info, params)
         params = {
             meeting_detail: '',
             map_url: nil
         }.merge(params)
-        check_required_options(params, INVOKE_MEETINGTICKET_REQUIRED_FIELDS)
-        {card:{
+        WeixinAuthorize.check_required_options(params, INVOKE_MEETINGTICKET_REQUIRED_FIELDS, MODULE_JSON_HELPER_NAME)
+        {
+          card: {
             card_type: 'MEETING_TICKET',
             base_info: bash_info,
             meeting_detail: params[:meeting_detail],
-            map_url: params[:map_url]}
+            map_url: params[:map_url]
+          }
         }
       end
     end
 
     INVOKE_SCENICTICKET_REQUIRED_FIELDS = %i(ticket_class guide_url)
-    class ScenicTicket < CardJsonHelperClass
+    class ScenicTicket
       # 创建景区门票json
       def self.create(bash_info, params)
         params = {
             ticket_class: '',
             guide_url: ''
         }.merge(params)
-        check_required_options(params, INVOKE_SCENICTICKET_REQUIRED_FIELDS)
-        {card:{
+        WeixinAuthorize.check_required_options(params, INVOKE_SCENICTICKET_REQUIRED_FIELDS, MODULE_JSON_HELPER_NAME)
+        {
+          card: {
             card_type: 'SCENIC_TICKET',
             base_info: bash_info,
             ticket_class: params[:ticket_class],
-            guide_url: params[:guide_url]}
+            guide_url: params[:guide_url]
+          }
         }
       end
     end
 
     INVOKE_BOARDPASS_REQUIRED_FIELDS = %i(from to flight air_model departure_time landing_time)
-    class BoardingPass < CardJsonHelperClass
+    class BoardingPass
       # 创建飞机票json
       def self.create(bash_info, params)
         params = {
-            from: '',
-            to: '',
-            flight: '',
-            gate: nil,
-            check_in_url: nil,
-            air_model: '',
-            departure_time: '',
-            landing_time: ''
+          from: '',
+          to: '',
+          flight: '',
+          gate: nil,
+          check_in_url: nil,
+          air_model: '',
+          departure_time: '',
+          landing_time: ''
         }.merge(params)
-        check_required_options(params, INVOKE_BOARDPASS_REQUIRED_FIELDS)
-        {card:{
-            card_type: 'BOARDING_PASS',
-            base_info: bash_info,
-            detail: params[:detail]}
+        WeixinAuthorize.check_required_options(params, INVOKE_BOARDPASS_REQUIRED_FIELDS, MODULE_JSON_HELPER_NAME)
+      {
+        card: {
+          card_type: 'BOARDING_PASS',
+          base_info: bash_info,
+          detail: params[:detail]
         }
+      }
       end
     end
 
     INVOKE_MOVIETICKET_REQUIRED_FIELDS = %i(tickedetailt_class)
-    class MovieTicket < CardJsonHelperClass
+    class MovieTicket
       # 创建电影票json
       def self.create(bash_info, params)
         params = {
-            tickedetailt_class: ''
+          tickedetailt_class: ''
         }.merge(params)
-        check_required_options(params, INVOKE_MOVIETICKET_REQUIRED_FIELDS)
-        {card:{
+        WeixinAuthorize.check_required_options(params, INVOKE_MOVIETICKET_REQUIRED_FIELDS, MODULE_JSON_HELPER_NAME)
+        {
+          card: {
             card_type: 'MOVIE_TICKET',
             base_info: bash_info,
-            detail: params[:detail]}
+            detail: params[:detail]
+          }
         }
       end
     end
   end
 
   module Api
+    MODULE_API_CARD_NAME = 'Card API(微信卡券接口)'
     module Card
       def card_ext(card_id='', code=nil, openid=nil)
         timestamp = Time.now.to_i
@@ -354,25 +358,28 @@ module WeixinAuthorize
         sort_params = [ apiticket, timestamp.to_s, card_id.to_s, code.to_s, openid.to_s, nonce_str ].sort.join
         signature = Digest::SHA1.hexdigest(sort_params)
         {
-            code: code,
-            openid: openid,
-            timestamp: timestamp,
-            nonce_str: nonce_str,
-            signature: signature
+          code: code,
+          openid: openid,
+          timestamp: timestamp,
+          nonce_str: nonce_str,
+          signature: signature
         }
       end
+
       # 预览接口
       # https://api.weixin.qq.com/cgi-bin/message/mass/preview?access_token=ACCESS_TOKEN
       # touser = option { openid: openid, wxname: wxname }
       def card_send_preview(card_id='', towxname='', toopenid='')
         url = "/message/mass/preview"
         wxcard_body = {
-            card_id: card_id,
-            card_ext: card_ext
+          card_id: card_id,
+          card_ext: card_ext
         }
-        post_body = { msgtype: 'wxcard' }.merge(wxcard_body)
-        post_body = post_body.merge({ touser: toopenid }) if !toopenid.nil? || !toopenid.empty?
-        post_body = post_body.merge({ towxname: towxname }) if !towxname.nil? ||!towxname.empty?
+        post_body = {
+          msgtype: 'wxcard',
+          touser: toopenid,
+          towxname: towxname
+        }.merge(wxcard_body)
         http_post(url, post_body)
       end
 
@@ -391,9 +398,9 @@ module WeixinAuthorize
         end_date = datacube_datetime_format end_date
         url = "#{datacube_base_url}/getcardmembercardinfo"
         post_body = {
-            begin_date: begin_date,
-            end_date: end_date,
-            cond_source: cond_source
+          begin_date: begin_date,
+          end_date: end_date,
+          cond_source: cond_source
         }
         http_post(url, post_body, {}, 'api')
       end
@@ -405,10 +412,10 @@ module WeixinAuthorize
         end_date = datacube_datetime_format end_date
         url = "#{datacube_base_url}/getcardcardinfo"
         post_body = {
-            begin_date: begin_date,
-            end_date: end_date,
-            cond_source: cond_source,
-            card_id: card_id
+          begin_date: begin_date,
+          end_date: end_date,
+          cond_source: cond_source,
+          card_id: card_id
         }
         http_post(url, post_body, {}, 'api')
       end
@@ -420,9 +427,9 @@ module WeixinAuthorize
         end_date = datacube_datetime_format end_date
         url = "#{datacube_base_url}/getcardbizuininfo"
         post_body = {
-            begin_date: begin_date,
-            end_date: end_date,
-            cond_source: cond_source
+          begin_date: begin_date,
+          end_date: end_date,
+          cond_source: cond_source
         }
         http_post(url, post_body, {}, 'api')
       end
@@ -432,8 +439,8 @@ module WeixinAuthorize
       def card_testwhitelist(wxusername=[], openid=[])
         url = "#{card_base_url}/testwhitelist/set"
         post_body = {
-            openid: openid[0, 9], # 微信接口限制10个白名单用户，多余的抛弃
-            username: wxusername[0,9] # 微信接口限制10个白名单用户，多余的抛弃
+          openid: openid[0, 9], # 微信接口限制10个白名单用户，多余的抛弃
+          username: wxusername[0,9] # 微信接口限制10个白名单用户，多余的抛弃
         }
         http_post(url, post_body, {}, 'api')
       end
@@ -443,7 +450,7 @@ module WeixinAuthorize
       def card_mpnews_html(card_id=nil)
         url = "#{card_base_url}/mpnews/gethtml"
         post_body = {
-            card_id: card_id
+          card_id: card_id
         }
         http_post(url, post_body, {}, 'api')
       end
@@ -453,8 +460,8 @@ module WeixinAuthorize
       def card_code_check(card_id='', codelist=[])
         url = "#{card_base_url}/code/checkcode"
         post_body = {
-            card_id: card_id,
-            code: codelist
+          card_id: card_id,
+          code: codelist
         }
         http_post(url, post_body, {}, 'api')
       end
@@ -465,8 +472,8 @@ module WeixinAuthorize
       def card_code_deposit(card_id='', codelist=[])
         url = "#{card_base_url}/code/deposit"
         post_body = {
-            card_id: card_id,
-            code: codelist
+          card_id: card_id,
+          code: codelist
         }
         http_post(url, post_body, {}, 'api')
       end
@@ -497,11 +504,11 @@ module WeixinAuthorize
       def card_landingpage_create(banner='', title='', can_share=false, scene='', cardlist=[{cardid: '', thumb_url: ''}])
         url = "#{card_base_url}/landingpage/create"
         post_body = {
-            banner: banner,
-            title: title,
-            can_share: can_share,
-            scene: scene,
-            cardlist: cardlist
+          banner: banner,
+          title: title,
+          can_share: can_share,
+          scene: scene,
+          cardlist: cardlist
         }
         http_post(url, post_body, {}, 'api')
       end
@@ -509,19 +516,19 @@ module WeixinAuthorize
       # 创建二维码接口
       # https://api.weixin.qq.com/card/qrcode/create?access_token=TOKEN
       def card_qrcode_create(card_id='', code=nil, openid=nil,
-                           expire_seconds=nil,   is_unique_code=nil, outer_id=nil)
+                             expire_seconds=nil,   is_unique_code=nil, outer_id=nil)
         url = "#{card_base_url}/qrcode/create"
         card_body = {
-            card_id: card_id,
-            code: code,
-            openid: openid,
-            is_unique_code: is_unique_code,
-            outer_id: outer_id
+          card_id: card_id,
+          code: code,
+          openid: openid,
+          is_unique_code: is_unique_code,
+          outer_id: outer_id
         }
         post_body = {
-            action_name: 'QR_CARD',
-            expire_seconds: expire_seconds,
-            action_info: {card: card_body}
+          action_name: 'QR_CARD',
+          expire_seconds: expire_seconds,
+          action_info: {card: card_body}
         }
         http_post(url, post_body, {}, 'api')
       end
@@ -531,7 +538,7 @@ module WeixinAuthorize
       def card_code_decrypt(encrypt_code='')
         url = "#{card_base_url}/code/decrypt"
         post_body = {
-            encrypt_code: encrypt_code
+          encrypt_code: encrypt_code
         }
         http_post(url, post_body, {}, 'api')
       end
@@ -541,8 +548,8 @@ module WeixinAuthorize
       def card_code_consume(card_id=nil, code='')
         url = "#{card_base_url}/code/consume"
         post_body = {
-            card_id: card_id,
-            code: code
+          card_id: card_id,
+          code: code
         }
         http_post(url, post_body, {}, 'api')
       end
@@ -553,8 +560,8 @@ module WeixinAuthorize
       def card_code_unavailable(card_id=nil, code='')
         url = "#{card_base_url}/code/unavailable"
         post_body = {
-            card_id: card_id,
-            code: code
+          card_id: card_id,
+          code: code
         }
         http_post(url, post_body, {}, 'api')
       end
@@ -564,7 +571,7 @@ module WeixinAuthorize
       def card_delete(card_id='')
         url = "#{card_base_url}/delete"
         post_body = {
-            card_id: card_id
+          card_id: card_id
         }
         http_post(url, post_body, {}, 'api')
       end
@@ -575,9 +582,9 @@ module WeixinAuthorize
       def card_code_update(card_id=nil, code='', new_code='')
         url = "#{card_base_url}/code/update"
         post_body = {
-            card_id: card_id,
-            code: code,
-            new_code: new_code
+          card_id: card_id,
+          code: code,
+          new_code: new_code
         }
         http_post(url, post_body, {}, 'api')
       end
@@ -587,20 +594,25 @@ module WeixinAuthorize
       def card_modify_stock(card_id='', increase_stock_value=nil, reduce_stock_value=nil)
         url = "#{card_base_url}/modifystock"
         post_body = {
-            card_id: card_id,
-            increase_stock_value: increase_stock_value,
-            reduce_stock_value: reduce_stock_value
+          card_id: card_id,
+          increase_stock_value: increase_stock_value,
+          reduce_stock_value: reduce_stock_value
         }
         http_post(url, post_body, {}, 'api')
       end
 
       # 更改卡券信息接口
       # https://api.weixin.qq.com/card/update?access_token=TOKEN
-      def card_update(card_id='', card)
+      def card_update(card_id='', card_type='', card)
+        card = card[:card] if card.has_key?(:card)
+        post_body = {
+          card_id: card_id,
+          "#{card_type}": card
+        }
         endpoint = 'api'
         endpoint = 'plain' if card.is_a?(String) # 第三方开发者自定义json
         url = "#{card_base_url}/update"
-        http_post(url, card, {}, endpoint)
+        http_post(url, post_body, {}, endpoint)
       end
 
       # 批量查询卡列表
@@ -619,9 +631,9 @@ module WeixinAuthorize
       def cards(offset=0, count=50, status_list=['CARD_STATUS_USER_DISPATCH'])
         url = "#{card_base_url}/batchget"
         post_body = {
-            offset: offset,
-            count: count,
-            status_list: status_list
+          offset: offset,
+          count: count,
+          status_list: status_list
         }
         http_post(url, post_body, {}, 'api')
       end
@@ -631,7 +643,7 @@ module WeixinAuthorize
       def card(card_id='')
         url = "#{card_base_url}/get"
         post_body = {
-            card_id: card_id
+          card_id: card_id
         }
         http_post(url, post_body, {}, 'api')
       end
@@ -641,8 +653,8 @@ module WeixinAuthorize
       def user_cards(openid='', card_id=nil)
         url = "#{card_base_url}/user/getcardlist"
         post_body = {
-            openid: openid,
-            card_id: card_id
+          openid: openid,
+          card_id: card_id
         }
         http_post(url, post_body, {}, 'api')
       end
@@ -653,8 +665,8 @@ module WeixinAuthorize
       def card_code(card_id=nil, code='')
         url = "#{card_base_url}/code/get"
         post_body = {
-            code: code,
-            card_id: card_id
+          code: code,
+          card_id: card_id
         }
         http_post(url, post_body, {}, 'api')
       end
@@ -664,26 +676,17 @@ module WeixinAuthorize
       # https://api.weixin.qq.com/card/meetingticket/updateuser?access_token=TOKEN
       def card_meeting_ticket_update_user(params)
         params = {
-            code: '',
-            card_id: nil,
-            begin_time: nil,
-            end_time: nil,
-            zone: '',
-            entrance: '',
-            seat_number: ''
+          code: '',
+          card_id: nil,
+          begin_time: nil,
+          end_time: nil,
+          zone: '',
+          entrance: '',
+          seat_number: ''
         }.merge(params)
-        check_required_options(params, INVOKE_MEETINGTICKET_UPDATE_REQUIRED_FIELDS)
+        WeixinAuthorize.check_required_options(params, INVOKE_MEETINGTICKET_UPDATE_REQUIRED_FIELDS, MODULE_API_CARD_NAME)
         url = "#{card_base_url}/meetingticket/updateuser"
-        post_body = {
-            code:         params[:code],
-            card_id:      params[:card_id],
-            begin_time:   params[:begin_time],
-            end_time:     params[:end_time],
-            zone:         params[:zone],
-            entrance:     params[:entrance],
-            seat_number:  params[:seat_number]
-        }
-        http_post(url, post_body, {}, 'api')
+        http_post(url, params, {}, 'api')
       end
 
       INVOKE_MOVIETICKET_UPDATE_REQUIRED_FIELDS = %i(show_time duration code card_id ticket_class)
@@ -691,53 +694,36 @@ module WeixinAuthorize
       # https://api.weixin.qq.com/card/movieticket/updateuser?access_token=TOKEN
       def card_moive_ticket_update_user(params)
         params = {
-            code: '',
-            card_id: '',
-            ticket_class: '',
-            screening_room: nil,
-            seat_number: nil,
-            show_time: nil,
-            duration: nil
+          code: '',
+          card_id: '',
+          ticket_class: '',
+          screening_room: nil,
+          seat_number: nil,
+          show_time: nil,
+          duration: nil
         }.merge(params)
-        check_required_options(params, INVOKE_MOVIETICKET_UPDATE_REQUIRED_FIELDS)
+        WeixinAuthorize.check_required_options(params, INVOKE_MOVIETICKET_UPDATE_REQUIRED_FIELDS, MODULE_API_CARD_NAME)
         url = "#{card_base_url}/movieticket/updateuser"
-        post_body = {
-            code:           params[:code],
-            card_id:        params[:card_id],
-            ticket_class:   params[:ticket_class],
-            screening_room: params[:screening_room],
-            seat_number:    params[:seat_number],
-            show_time:      params[:show_time],
-            duration:       params[:duration]
-        }
-        http_post(url, post_body, {}, 'api')
+        http_post(url, params, {}, 'api')
       end
 
       INVOKE_BOARDPASS_UPDATE_REQUIRED_FIELDS = %i(code passenger_name etkt_bnr)
       # 更新飞机票信息
       # https://api.weixin.qq.com/card/boardingpass/checkin?access_token=TOKEN
       def card_boarding_pass_checkin(params)
-        params = {code: '',
-                  card_id: nil,
-                  passenger_name: '',
-                  class: '',
-                  seat: nil,
-                  etkt_bnr: nil,
-                  qrcode_data: nil,
-                  is_cancel: nil
+        params = {
+          code: '',
+          card_id: nil,
+          passenger_name: '',
+          class: '',
+          seat: nil,
+          etkt_bnr: nil,
+          qrcode_data: nil,
+          is_cancel: nil
         }.merge(params)
-        check_required_options(params, INVOKE_BOARDPASS_UPDATE_REQUIRED_FIELDS)
+        WeixinAuthorize.check_required_options(params, INVOKE_BOARDPASS_UPDATE_REQUIRED_FIELDS, MODULE_API_CARD_NAME)
         url = "#{card_base_url}/boardingpass/checkin"
-        post_body = {
-            code:        params[:code],
-            card_id:     params[:card_id],
-            etkt_bnr:    params[:etkt_bnr],
-            class:       params[:class],
-            qrcode_data: params[:qrcode_data],
-            seat:        params[:seat],
-            is_cancel:   params[:is_cancel]
-        }
-        http_post(url, post_body, {}, 'api')
+        http_post(url, params, {}, 'api')
       end
 
       # 微信卡券创建接口
@@ -750,25 +736,19 @@ module WeixinAuthorize
       end
 
       private
-        def datacube_base_url
-          "/datacube"
-        end
+      def datacube_base_url
+        "/datacube"
+      end
 
-        def card_base_url
-          "/card"
-        end
+      def card_base_url
+        "/card"
+      end
 
-        def check_required_options(options, names)
-          names.each do |name|
-            warn("Weixin Card: missing required param: #{name}") if options.nil? || !options.has_key?(name) || options[name].nil? || options[name].empty?
-          end
-        end
-
-        def datacube_datetime_format(param)
-          param = Time.at(param) if param.is_a?(Integer)
-          param = param.strftime("%Y-%m-%d") if param.is_a?(Time)
-          param
-        end
+      def datacube_datetime_format(param)
+        param = Time.at(param) if param.is_a?(Integer)
+        param = param.strftime("%Y-%m-%d") if param.is_a?(Time)
+        param
+      end
 
     end
   end
