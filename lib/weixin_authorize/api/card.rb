@@ -620,14 +620,13 @@ module WeixinAuthorize
       # offset => 查询卡列表的起始偏移量，从0开始，即offset: 5是指从从列表里的第六个开始读取。
       # count => 需要查询的卡片的数量（数量最大50）。
       # status_list => 支持开发者拉出指定状态的卡券列表，例：仅拉出通过审核的卡券。
-
+      #
       # 卡券状态
       # CARD_STATUS_NOT_VERIFY    待审核
       # CARD_STATUS_VERIFY_FALL   审核失败
       # CARD_STATUS_VERIFY_OK     通过审核
       # CARD_STATUS_USER_DELETE   卡券被用户删除
       # CARD_STATUS_USER_DISPATCH 在公众平台投放过的卡券
-
       def cards(offset=0, count=50, status_list=['CARD_STATUS_USER_DISPATCH'])
         url = "#{card_base_url}/batchget"
         post_body = {
@@ -669,6 +668,51 @@ module WeixinAuthorize
           card_id: card_id
         }
         http_post(url, post_body, {}, 'api')
+      end
+
+      INVOKE_MEMBERCARD_ACTIVATE_REQUIRED_FIELDS = %i(membership_number code)
+      # 激活/绑定会员卡
+      # https://api.weixin.qq.com/card/membercard/activate?access_token=TOKEN
+      def card_member_card_activate(params)
+        params = {
+          membership_number: '',
+          code: '',
+          activate_begin_time: nil,
+          activate_end_time: nil,
+          init_bonus: nil,
+          init_balance: nil,
+          init_custom_field_value1: nil,
+          init_custom_field_value2: nil,
+          init_custom_field_value3: nil,
+        }.merge(params)
+        WeixinAuthorize.check_required_options(params, INVOKE_MEMBERCARD_ACTIVATE_REQUIRED_FIELDS, MODULE_API_CARD_NAME)
+        url = "#{card_base_url}/membercard/activate"
+        http_post(url, params, {}, 'api')
+      end
+
+      INVOKE_MEMBERCARD_UPDATE_REQUIRED_FIELDS = %i(code card_id)
+      # 更新会员信息
+      # https://api.weixin.qq.com/card/membercard/updateuser?access_token=TOKEN
+      def card_member_card_update_user(params)
+        invoke_required_fields = INVOKE_MEMBERCARD_UPDATE_REQUIRED_FIELDS
+        invoke_required_fields << :bonus if params[:add_bonus].nil?
+        invoke_required_fields << :balance if params[:add_balance].nil?
+        params = {
+          code: '',
+          card_id: '',
+          add_bonus: nil,
+          bonus: nil,
+          record_bonus: '',
+          add_balance: nil,
+          balance: nil,
+          record_balance: '',
+          custom_field_value1: '',
+          custom_field_value2: '',
+          custom_field_value3: ''
+        }.merge(params)
+        WeixinAuthorize.check_required_options(params, invoke_required_fields, MODULE_API_CARD_NAME)
+        url = "#{card_base_url}/membercard/updateuser"
+        http_post(url, params, {}, 'api')
       end
 
       INVOKE_MEETINGTICKET_UPDATE_REQUIRED_FIELDS = %i(code zone entrance seat_number)
