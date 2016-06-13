@@ -183,8 +183,10 @@ module WeixinAuthorize
         {
           card: {
             card_type: 'GROUPON',
-            base_info: bash_info,
-            deal_detail: params[:deal_detail]
+            groupon: {
+              base_info: bash_info,
+              deal_detail: params[:deal_detail]
+            }
           }
         }
       end
@@ -202,9 +204,11 @@ module WeixinAuthorize
         {
           card: {
             card_type: 'CASH',
-            base_info: bash_info,
-            least_cost: params[:least_cost],
-            reduce_cost: params[:reduce_cost],
+            cash: {
+              base_info: bash_info,
+              least_cost: params[:least_cost],
+              reduce_cost: params[:reduce_cost],
+            }
           }
         }
       end
@@ -221,8 +225,10 @@ module WeixinAuthorize
         {
           card: {
             card_type: 'DISCOUNT',
-            base_info: bash_info,
-            discount: params[:discount]
+            discount: {
+              base_info: bash_info,
+              discount: params[:discount]
+            }
           }
         }
       end
@@ -238,9 +244,11 @@ module WeixinAuthorize
         WeixinAuthorize.check_required_options(params, INVOKE_GIFT_REQUIRED_FIELDS, MODULE_JSON_HELPER_NAME)
         {
           card: {
-            card_type: 'DISCOUNT',
-            base_info: bash_info,
-            gift: params[:gift]
+            card_type: 'GIFT',
+            gift: {
+              base_info: bash_info,
+              gift: params[:gift]
+            },
           }
         }
       end
@@ -257,8 +265,10 @@ module WeixinAuthorize
         {
           card: {
             card_type: 'GENERAL_COUPON',
-            base_info: bash_info,
-            default_detail: params[:default_detail]
+            general_coupon: {
+              base_info: bash_info,
+              default_detail: params[:default_detail]
+            }
           }
         }
       end
@@ -276,9 +286,11 @@ module WeixinAuthorize
         {
           card: {
             card_type: 'MEETING_TICKET',
-            base_info: bash_info,
-            meeting_detail: params[:meeting_detail],
-            map_url: params[:map_url]
+            meeting_ticket: {
+              base_info: bash_info,
+              meeting_detail: params[:meeting_detail],
+              map_url: params[:map_url]
+            }
           }
         }
       end
@@ -296,9 +308,11 @@ module WeixinAuthorize
         {
           card: {
             card_type: 'SCENIC_TICKET',
-            base_info: bash_info,
-            ticket_class: params[:ticket_class],
-            guide_url: params[:guide_url]
+            scenic_ticket: {
+              base_info: bash_info,
+              ticket_class: params[:ticket_class],
+              guide_url: params[:guide_url]
+            }
           }
         }
       end
@@ -319,13 +333,15 @@ module WeixinAuthorize
           landing_time: ''
         }.merge(params)
         WeixinAuthorize.check_required_options(params, INVOKE_BOARDPASS_REQUIRED_FIELDS, MODULE_JSON_HELPER_NAME)
-      {
-        card: {
-          card_type: 'BOARDING_PASS',
+        boarding_pass = {
           base_info: bash_info,
-          detail: params[:detail]
         }
-      }
+        {
+          card: {
+            card_type: 'BOARDING_PASS',
+            boarding_pass: boarding_pass.merge(params)
+          }
+        }
       end
     end
 
@@ -340,8 +356,10 @@ module WeixinAuthorize
         {
           card: {
             card_type: 'MOVIE_TICKET',
-            base_info: bash_info,
-            detail: params[:detail]
+            movie_ticket: {
+              base_info: bash_info,
+              detail: params[:detail]
+            }
           }
         }
       end
