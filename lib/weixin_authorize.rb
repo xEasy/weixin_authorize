@@ -106,7 +106,9 @@ module WeixinAuthorize
             options[name].nil?     ||
             (!options[name].is_a?(Integer) && options[name].empty?)
       end
-      raise "#{module_name}: missing required param(缺少参数): #{missinglsit.join(', ')}"
+      if missinglsit.size > 0
+        raise "#{module_name}: missing required param(缺少参数): #{missinglsit.join(', ')}"
+      end
     end
 
   end
