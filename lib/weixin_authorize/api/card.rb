@@ -803,21 +803,21 @@ module WeixinAuthorize
       def submerchant_get(params)
         WeixinAuthorize.check_required_options params, INVOKE_SUBMERCHANT_GET_REQUIRED_FIELDS, MODULE_API_CARD_NAME
         url = "#{card_base_url}/submerchant/get"
-        http_post(url, params, {})
+        http_post(url, params, {}, 'api')
       end
 
       INVOKE_SUBMERCHANT_BATCHGET_REQUIRED_FIELDS = %i(begin_id limit status)
       # 批量拉取子商户信息接口
       # https://api.weixin.qq.com/card/submerchant/batchget?access_token=TOKEN
       # {  "begin_id": 0,  "limit": 50,  "status": "CHECKING" }
-      def submerchant_batchget
+      def submerchant_batchget(params)
         params = {
           begin_id: 0,
           limit: 50,
           status: ''
         }.merge(params)
         WeixinAuthorize.check_required_options params, INVOKE_SUBMERCHANT_BATCHGET_REQUIRED_FIELDS, MODULE_API_CARD_NAME
-        http_post(url, params, {})
+        http_post(url, params, {}, 'api')
       end
 
       INVOKE_SUBMERCHANT_CREATE_REQUIRED_FIELDS = %i(brand_name logo_url protocol end_time primary_category_id secondary_category_id)
@@ -826,7 +826,7 @@ module WeixinAuthorize
       def submerchant_create(params)
         WeixinAuthorize.check_required_options(params, INVOKE_SUBMERCHANT_CREATE_REQUIRED_FIELDS, MODULE_API_CARD_NAME)
         url = "#{card_base_url}/submerchant/submit"
-        http_post(url, { info: params }, {})
+        http_post(url, { info: params }, {}, 'api')
       end
 
       INVOKE_SUBMERCHANT_UPDATE_REQUIRED_FIELDS = %i(merchant_id brand_name logo_url protocol end_time primary_category_id secondary_category_id)
@@ -835,14 +835,14 @@ module WeixinAuthorize
       def submerchant_update(params)
         WeixinAuthorize.check_required_options(params, INVOKE_SUBMERCHANT_UPDATE_REQUIRED_FIELDS, MODULE_API_CARD_NAME)
         url = "#{card_base_url}/submerchant/update"
-        http_post(url, { info: params }, {})
+        http_post(url, { info: params }, {}, 'api')
       end
 
       # 卡券开放类目查询接口
       # https://api.weixin.qq.com/card/getapplyprotocol?access_token=TOKEN
       def getapplyprotocol(params=nil)
         url = "#{card_base_url}/getapplyprotocol"
-        http_get(url, {}, {})
+        http_get(url, {}, 'api')
       end
 
       private
