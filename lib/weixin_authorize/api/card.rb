@@ -806,17 +806,16 @@ module WeixinAuthorize
         http_post(url, params, {}, 'api')
       end
 
-      INVOKE_SUBMERCHANT_BATCHGET_REQUIRED_FIELDS = %i(begin_id limit status)
       # 批量拉取子商户信息接口
       # https://api.weixin.qq.com/card/submerchant/batchget?access_token=TOKEN
       # {  "begin_id": 0,  "limit": 50,  "status": "CHECKING" }
-      def submerchant_batchget(params)
+      def submerchant_batchget(params={})
         params = {
           begin_id: 0,
           limit: 50,
-          status: ''
+          status: nil
         }.merge(params)
-        WeixinAuthorize.check_required_options params, INVOKE_SUBMERCHANT_BATCHGET_REQUIRED_FIELDS, MODULE_API_CARD_NAME
+        url = "#{card_base_url}/submerchant/batchget"
         http_post(url, params, {}, 'api')
       end
 
